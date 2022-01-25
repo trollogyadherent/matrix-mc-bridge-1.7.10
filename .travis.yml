@@ -1,0 +1,36 @@
+language: java
+sudo: false
+install: true
+cache:
+  directories:
+  - "$HOME/.gradle/caches/4.4.1"
+  - "$HOME/.gradle/caches/jars-1"
+  - "$HOME/.gradle/caches/jars-2"
+  - "$HOME/.gradle/caches/jars-3"
+  - "$HOME/.gradle/native"
+  - "$HOME/.gradle/daemon"
+  - "$HOME/.gradle/wrapper"
+  - "$HOME/.gradle/minecraft"
+jdk:
+  - openjdk8
+before_install:
+  - chmod +x gradlew
+jobs:
+ include:
+ - stage: buildAndDeploy
+   script: "./gradlew build"
+   deploy:
+    provider: releases
+    file: build/libs/*.jar
+    skip_cleanup: true
+    file_glob: true
+    on:
+      branch: 1.7.10
+#after_success:
+#  - wget https://raw.githubusercontent.com/bartimaeusnek/travis-ci-discord-webhook/master/send.sh
+#  - chmod +x send.sh
+#  - ./send.sh success $WEBHOOK_URL
+#after_failure:
+#  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+#  - chmod +x send.sh
+#  - ./send.sh failure $WEBHOOK_URL
