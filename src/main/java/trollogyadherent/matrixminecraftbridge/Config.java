@@ -25,6 +25,13 @@ public class Config {
                             "  \"username\": \"grepbot\",\n" +
                             "  \"password\": \"wordpass\",\n" +
                             "  \"usertoken\": \"user70ken\"\n" +
+                            "  \"roomid\": \"!xxxxxx\"\n" +
+                            "  \"startupMessage\": \"❇ Server has started\"\n" +
+                            "  \"stopMessage\": \"\uD83D\uDED1 Server has stopped\"\n" +
+                            "  \"joinMessage\": \"✅ %player% has joined the server\"\n" +
+                            "  \"leaveMessage\": \"❌ %player% has left the server\"\n" +
+                            "  \"deathMessage\": \"\uD83D\uDC80 %player% just died due to %reason%\"\n" +
+                            "  \"achievementMessage\": \"\uD83C\uDF86 %player% just gained the achievement %achievement%\n%description%\"\n" +
                             "}\n");
                     System.out.println("Default-config created!\r\n" + "You can pass username and password OR usertoken\r\nAdjust the config and restart the bot\r\nPassword will be cleaned and replaced with usertoken");
                     //System.exit(0);
@@ -36,14 +43,21 @@ public class Config {
                 String configContent = FileHelper.readFile(sConfigFile);
                 try {
                     JSONObject config = new JSONObject(configContent);
-                    if (!config.has("host") || !config.has("username") || !config.has("password") || !config.has("usertoken")) {
+                    if (!config.has("host") || !config.has("username") || !config.has("password") || !config.has("usertoken") || !config.has("roomid")) {
                         throw new JSONException("missing paramter!");
                     }
                     String host = config.getString("host");
                     String username = config.getString("username");
                     String password = config.getString("password");
                     String usertoken = config.getString("usertoken");
-                    configData = new ConfigData(host, username, password, usertoken);
+                    String roomId = config.getString("roomid");
+                    String startupMessage = config.getString("startupMessage");
+                    String stopMessage = config.getString("stopMessage");
+                    String joinMessage = config.getString("joinMessage");
+                    String leaveMessage = config.getString("leaveMessage");
+                    String deathMessage = config.getString("deathMessage");
+                    String achievementMessage = config.getString("achievementMessage");
+                    configData = new ConfigData(host, username, password, usertoken, roomId, startupMessage, stopMessage, joinMessage, leaveMessage, deathMessage, achievementMessage);
                 } catch (JSONException e) {
                     System.out.println("Configfile in from format! Watch for correct json-content!\r\nYou can delete the config and restart the bot to create a blank config");
                     //System.exit(1);

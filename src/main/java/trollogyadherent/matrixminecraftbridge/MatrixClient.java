@@ -2,15 +2,22 @@ package trollogyadherent.matrixminecraftbridge;
 
 import de.jojii.matrixclientserver.Bot.Client;
 import de.jojii.matrixclientserver.Bot.Events.RoomEvent;
+import de.jojii.matrixclientserver.Bot.Member;
+import de.jojii.matrixclientserver.Callbacks.MemberCallback;
 import de.jojii.matrixclientserver.File.FileHelper;
 import org.json.JSONObject;
+import org.lwjgl.Sys;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 public class MatrixClient {
+    private Client client;
     private static MatrixClient instance;
+    private MinecraftMessager minecraftMessagerInstance;
     private Config configInstance;
+    private String roomId;
 
     private MatrixClient() {
 
@@ -21,6 +28,7 @@ public class MatrixClient {
     public void connect() {
         configInstance = Config.getInstance();
         Client c = new Client(configInstance.getConfigData().getHost());
+        client = c;
         try {
             if (configInstance.getConfigData().getPassword().trim().length() > 0) {
                 final ConfigData finalConfigData = configInstance.getConfigData();
@@ -52,10 +60,10 @@ public class MatrixClient {
     }
 
     private void clientLoggedIn(Client c) {
-        System.out.println(c.getLoginData().getAccess_token());
+        //System.out.println(c.getLoginData().getAccess_token());
         c.registerRoomEventListener(roomEvents -> {
             for (RoomEvent event : roomEvents) {
-                System.out.println(event.getRaw().toString());
+                //System.out.println(event.getRaw().toString());
 
                 if (event.getType().equals("m.room.member") && event.getContent().has("membership") && event.getContent().getString("membership").equals("invite")) {
                     try {
@@ -64,7 +72,10 @@ public class MatrixClient {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else if (event.getType().equals("m.room.message")) {
+                } else if (event.getType().equals("m.room.message") && event.getRoom_id().equals(configInstance.getConfigData().getRoomId())) {
+                    if (event.getSender().equals(c.getLoginData().getUser_id())) {
+                        return;
+                    }
                     //Sends a readreceipt  for every received message
                     try {
                         c.sendReadReceipt(event.getRoom_id(), event.getEvent_id(), "m.read", null);
@@ -75,9 +86,23 @@ public class MatrixClient {
                     if (event.getContent().has("body")) {
                         String msg = RoomEvent.getBodyFromMessageEvent(event);
                         if (msg != null && msg.trim().length() > 0) {
-                            if (msg.toLowerCase(Locale.ROOT).startsWith("i'm")) {
-                                c.sendText(event.getRoom_id(), "Hello " + msg.substring(3), null);
+                            if (minecraftMessagerInstance == null) {
+                                minecraftMessagerInstance = MinecraftMessager.getInstance();
                             }
+                            MemberCallback memberCallback = new MemberCallback() {
+                                @Override
+                                public void onResponse(List<Member> list) throws IOException {
+                                    String message = "[" + event.getSender() + "] " + msg;
+                                    for (Member member : list) {
+                                        if (member.getId().equals(event.getSender())) {
+                                            message = "[" + member.getDisplay_name() + "] " + msg;
+                                            break;
+                                        }
+                                    }
+                                    minecraftMessagerInstance.sendToMinecraft(message);
+                                }
+                            };
+                            c.getRoomMembers(event.getRoom_id(), memberCallback);
                         }
                     }
                 }
@@ -90,5 +115,28 @@ public class MatrixClient {
             instance = new MatrixClient();
         }
         return instance;
+    }
+
+    public void sendToMatrix(String message) {
+        System.out.println("received message to send: " + message);
+        if (client == null) {
+            System.out.println("Warning client is null!");
+            return;
+        }
+        if (roomId == null) {
+            if (configInstance == null) {
+                configInstance = Config.getInstance();
+            }
+            roomId = configInstance.getConfigData().getRoomId();
+        }
+        if (roomId == null) {
+            System.out.println("Warning! Room ID not set!");
+            return;
+        }
+        try {
+            client.sendText(roomId, message, null);
+        } catch (Exception e) {
+            System.out.println("Warning! Failed to send message to room!");
+        }
     }
 }
