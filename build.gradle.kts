@@ -47,10 +47,10 @@ configure<UserExtension> {
     // Replaces version inside the mod
     includes.addAll(arrayOf(projectReferenceClass))
     replacements.putAll(
-        // Can be expanded to replace things like modid or mod name if it is something that changes frequently
-        mapOf(
-            Pair("@GRADLE_VERSION_TOKEN@", project.version)
-        )
+            // Can be expanded to replace things like modid or mod name if it is something that changes frequently
+            mapOf(
+                    Pair("@GRADLE_VERSION_TOKEN@", project.version)
+            )
     )
 }
 
@@ -91,12 +91,14 @@ dependencies {
     // Local libraries
     compile(fileTree("libs") { include("*.jar") })
     // Version loading
+
     val lombokVersion: String by project
     val manifoldVersion: String by project
     val codechickenlibVersion: String by project
     val codechickencoreVersion: String by project
     val neiVersion: String by project
     val wailaVersion: String by project
+    val jsonVersion: String by project
 
     // Java extensions
     compileOnly("org.projectlombok:lombok:$lombokVersion")
@@ -106,10 +108,13 @@ dependencies {
     annotationProcessor("systems.manifold:manifold-ext:$manifoldVersion")
 
     // Optional libraries for testing
-    runtimeOnly("mcp.mobius.waila:Waila:$wailaVersion")
+    /*runtimeOnly("mcp.mobius.waila:Waila:$wailaVersion")
     runtimeOnly("codechicken:CodeChickenLib:$codechickenlibVersion:dev")
     runtimeOnly("codechicken:CodeChickenCore:$codechickencoreVersion:dev")
-    runtimeOnly("codechicken:NotEnoughItems:$neiVersion:dev")
+    runtimeOnly("codechicken:NotEnoughItems:$neiVersion:dev")*/
+
+    // Project libs
+    implementation("org.json:json:$jsonVersion")
 }
 sourceSets.main {
     java {
@@ -133,10 +138,10 @@ tasks {
         //Replace versions in mcmod.info
         filesMatching("/mcmod.info") {
             expand(
-                mapOf(
-                    "version" to project.version,
-                    "mcversion" to projectMinecraftVersion
-                )
+                    mapOf(
+                            "version" to project.version,
+                            "mcversion" to projectMinecraftVersion
+                    )
             )
         }
     }
