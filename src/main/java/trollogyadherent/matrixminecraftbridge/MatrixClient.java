@@ -42,8 +42,15 @@ public class MatrixClient {
                         newConfig.put("username", finalConfigData.getUsername());
                         newConfig.put("password", "");
                         newConfig.put("usertoken", data.getAccess_token());
+                        newConfig.put("roomid", finalConfigData.getRoomId());
+                        newConfig.put("startupMessage", finalConfigData.getStartupMessage());
+                        newConfig.put("stopMessage", finalConfigData.getStopMessage());
+                        newConfig.put("joinMessage", finalConfigData.getJoinMessage());
+                        newConfig.put("leaveMessage", finalConfigData.getLeaveMessage());
+                        newConfig.put("deathMessage", finalConfigData.getDeathMessage());
+                        newConfig.put("achievementMessage", finalConfigData.getAchievementMessage());
                         //save new configfile
-                        FileHelper.writeFile(MatrixMinecraftBridge.CONFIGFILELOCATION, newConfig.toString());
+                        FileHelper.writeFile(MatrixMinecraftBridge.CONFIGFILELOCATION, newConfig.toString(1));
 
                         clientLoggedIn(c);
                     } else {
