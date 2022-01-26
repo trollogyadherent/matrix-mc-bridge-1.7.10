@@ -4,6 +4,7 @@ import de.jojii.matrixclientserver.Bot.Client;
 import de.jojii.matrixclientserver.Bot.Events.RoomEvent;
 import de.jojii.matrixclientserver.Bot.Member;
 import de.jojii.matrixclientserver.Callbacks.MemberCallback;
+import de.jojii.matrixclientserver.Callbacks.RoomEventsCallback;
 import de.jojii.matrixclientserver.File.FileHelper;
 import org.json.JSONObject;
 import org.lwjgl.Sys;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MatrixClient {
-    private Client client;
+    public Client client;
     private static MatrixClient instance;
     private MinecraftMessager minecraftMessagerInstance;
     private Config configInstance;
@@ -60,54 +61,68 @@ public class MatrixClient {
     }
 
     private void clientLoggedIn(Client c) {
+        System.out.println("LOGGED IN MATRIX");
         //System.out.println(c.getLoginData().getAccess_token());
-        c.registerRoomEventListener(roomEvents -> {
-            for (RoomEvent event : roomEvents) {
-                //System.out.println(event.getRaw().toString());
+        //c.registerRoomEventListener(roomEvents -> {
 
-                if (event.getType().equals("m.room.member") && event.getContent().has("membership") && event.getContent().getString("membership").equals("invite")) {
-                    try {
-                        //make bot autojoin
-                        c.joinRoom(event.getRoom_id(), null);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else if (event.getType().equals("m.room.message") && event.getRoom_id().equals(configInstance.getConfigData().getRoomId())) {
-                    if (event.getSender().equals(c.getLoginData().getUser_id())) {
-                        return;
-                    }
-                    //Sends a readreceipt  for every received message
-                    try {
-                        c.sendReadReceipt(event.getRoom_id(), event.getEvent_id(), "m.read", null);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
 
-                    if (event.getContent().has("body")) {
-                        String msg = RoomEvent.getBodyFromMessageEvent(event);
-                        if (msg != null && msg.trim().length() > 0) {
-                            if (minecraftMessagerInstance == null) {
-                                minecraftMessagerInstance = MinecraftMessager.getInstance();
-                            }
-                            MemberCallback memberCallback = new MemberCallback() {
-                                @Override
-                                public void onResponse(List<Member> list) throws IOException {
-                                    String message = "[" + event.getSender() + "] " + msg;
-                                    for (Member member : list) {
-                                        if (member.getId().equals(event.getSender())) {
-                                            message = "[" + member.getDisplay_name() + "] " + msg;
-                                            break;
-                                        }
-                                    }
-                                    minecraftMessagerInstance.sendToMinecraft(message);
+        RoomEventsCallback event = new RoomEventsCallback() {
+            @Override
+            public void onEventReceived(List<RoomEvent> roomEvents) throws IOException {
+                for (RoomEvent event : roomEvents) {
+                    System.out.println(event.getRaw().toString());
+
+                    if (event.getType().equals("m.room.member") && event.getContent().has("membership") && event.getContent().getString("membership").equals("invite")) {
+                        try {
+                            //make bot autojoin
+                            c.joinRoom(event.getRoom_id(), null);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else if (event.getType().equals("m.room.message") && event.getRoom_id().equals(configInstance.getConfigData().getRoomId())) {
+                        System.out.println("RECEIVED MESSAGE EVENT");
+                        if (event.getSender().equals(c.getLoginData().getUser_id())) {
+                            System.out.println("Ignoring own message");
+                            return;
+                        }
+                        //Sends a readreceipt  for every received message
+                        try {
+                            c.sendReadReceipt(event.getRoom_id(), event.getEvent_id(), "m.read", null);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (event.getContent().has("body")) {
+                            String msg = RoomEvent.getBodyFromMessageEvent(event);
+                            if (msg != null && msg.trim().length() > 0) {
+                                if (minecraftMessagerInstance == null) {
+                                    minecraftMessagerInstance = MinecraftMessager.getInstance();
                                 }
-                            };
-                            c.getRoomMembers(event.getRoom_id(), memberCallback);
+                                MemberCallback memberCallback = new MemberCallback() {
+                                    @Override
+                                    public void onResponse(List<Member> list) throws IOException {
+                                        String message = "[" + event.getSender() + "] " + msg;
+                                        for (Member member : list) {
+                                            if (member.getId().equals(event.getSender())) {
+                                                message = "[" + member.getDisplay_name() + "] " + msg;
+                                                break;
+                                            }
+                                        }
+                                        minecraftMessagerInstance.sendToMinecraft(message);
+                                    }
+                                };
+                                c.getRoomMembers(event.getRoom_id(), memberCallback);
+                            }
                         }
                     }
                 }
             }
-        });
+        };
+        c.registerRoomEventListener(event);
+
+
+        /*{
+            );*/
     }
 
     public static MatrixClient getInstance() {

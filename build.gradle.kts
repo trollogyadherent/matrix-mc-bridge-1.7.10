@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.minecraftforge.gradle.user.UserExtension
+
 import java.io.*
 
 buildscript {
@@ -20,6 +21,7 @@ plugins {
     id("com.palantir.git-version") version "0.12.3"
     id("com.github.johnrengelman.shadow") version "4.0.4"
 }
+
 // Downloads Javadocs and sources for dependencies
 idea {
     module {
@@ -114,7 +116,8 @@ dependencies {
     runtimeOnly("codechicken:NotEnoughItems:$neiVersion:dev")*/
 
     // Project libs
-    implementation("org.json:json:$jsonVersion")
+    shadowImplementation("org.json:json:$jsonVersion")
+    shadowImplementation(fileTree("libs") {include("Matrix-ClientServer-API-java.jar")})
 }
 sourceSets.main {
     java {
@@ -124,12 +127,16 @@ sourceSets.main {
     // Uncomment this if you get missing textures when debugging.
     // output.setResourcesDir(output.classesDirs.asPath)
 }
+
 tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.compilerArgs.add("-Xplugin:Manifold")
         options.compilerArgs.add("-Xlint:deprecation")
         options.compilerArgs.add("-Xlint:unchecked")
+    }
+    withType<Javadoc>{
+        options.encoding = "UTF-8"
     }
     withType<Jar> {
         // Mark as outdated if versions change
@@ -159,6 +166,11 @@ tasks {
     jar {
         dependsOn(shadowJarTask)
         enabled = false
+        this.manifest.attributes(
+                mapOf(
+                        Pair("FMLAT", "matrixminecraftbridge_at.cfg")
+                )
+        )
     }
     val sourcesJar by creating(Jar::class) {
         from(sourceSets.main.get().allSource)

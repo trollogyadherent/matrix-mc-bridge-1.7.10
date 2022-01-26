@@ -27,6 +27,9 @@ public class MinecraftMessager {
         System.out.println("GOT MATRIX MESSAGE: " + message);
         ChatComponentText componentMessage = utilInstance.getChatCompWithLinks(message);
         MinecraftServer minecraftServer = MinecraftServer.getServer();
+        if (minecraftServer == null) {
+            return;
+        }
         final List<EntityPlayerMP> players = new ArrayList<>();
         minecraftServer.getConfigurationManager().playerEntityList
                 .forEach(playerEntity -> {
