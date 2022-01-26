@@ -62,10 +62,6 @@ public class MatrixClient {
 
     private void clientLoggedIn(Client c) {
         System.out.println("LOGGED IN MATRIX");
-        //System.out.println(c.getLoginData().getAccess_token());
-        //c.registerRoomEventListener(roomEvents -> {
-
-
         RoomEventsCallback event = new RoomEventsCallback() {
             @Override
             public void onEventReceived(List<RoomEvent> roomEvents) throws IOException {
@@ -119,10 +115,6 @@ public class MatrixClient {
             }
         };
         c.registerRoomEventListener(event);
-
-
-        /*{
-            );*/
     }
 
     public static MatrixClient getInstance() {
