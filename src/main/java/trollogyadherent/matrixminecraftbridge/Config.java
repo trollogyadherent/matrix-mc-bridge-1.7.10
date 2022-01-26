@@ -32,13 +32,13 @@ public class Config {
                             "  \"host\": \"http://home.server\",\n" +
                             "  \"username\": \"@matrix-bot:home.server\",\n" +
                             "  \"password\": \"ilikepie\",\n" +
-                            "  \"usertoken\": \"user70ken\"\n" +
-                            "  \"roomid\": \"!xxxxxx\"\n" +
-                            "  \"startupMessage\": \"❇ Server has started\"\n" +
-                            "  \"stopMessage\": \"\uD83D\uDED1 Server has stopped\"\n" +
-                            "  \"joinMessage\": \"✅ %player% has joined the server\"\n" +
-                            "  \"leaveMessage\": \"❌ %player% has left the server\"\n" +
-                            "  \"deathMessage\": \"\uD83D\uDC80 %player% just died due to %reason%\"\n" +
+                            "  \"usertoken\": \"user70ken\",\n" +
+                            "  \"roomid\": \"!xxxxxx\",\n" +
+                            "  \"startupMessage\": \"❇ Server has started\",\n" +
+                            "  \"stopMessage\": \"\uD83D\uDED1 Server has stopped\",\n" +
+                            "  \"joinMessage\": \"✅ %player% has joined the server\",\n" +
+                            "  \"leaveMessage\": \"❌ %player% has left the server\",\n" +
+                            "  \"deathMessage\": \"\uD83D\uDC80 %player% just died due to %reason%\",\n" +
                             "  \"achievementMessage\": \"\uD83C\uDF86 %player% just gained the achievement %achievement%\\n%description%\"\n" +
                             "}\n");
                     System.out.println("Default-config created!\r\n" + "You can pass username and password OR usertoken\r\nAdjust the config and restart the bot\r\nPassword will be cleaned and replaced with usertoken");
