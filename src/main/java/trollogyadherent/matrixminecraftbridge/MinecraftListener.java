@@ -32,7 +32,7 @@ public class MinecraftListener {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onServerChatMessage(ServerChatEvent event) {
-        System.out.println("RECEIVED MESSAGE");
+        //System.out.println("RECEIVED MESSAGE");
         if (event.isCanceled() || event.player == null) return;
 
         if (event.player instanceof FakePlayer) {
@@ -79,7 +79,7 @@ public class MinecraftListener {
 
             String username = entityPlayer.getDisplayName();
             Achievement achievement = event.achievement;
-            System.out.println(achievement.achievementDescription);
+            //System.out.println(achievement.achievementDescription);
             String description = StatCollector.translateToLocalFormatted(achievement.achievementDescription, "KEY");
             String message = configInstance.getConfigData().getAchievementMessage().replace("%player%", username).replace("%achievement%", achievement.func_150951_e ().getUnformattedText()).replace("%description%", description);
             MatrixClient.getInstance().sendToMatrix(message);

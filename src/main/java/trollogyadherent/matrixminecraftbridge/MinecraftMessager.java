@@ -24,7 +24,7 @@ public class MinecraftMessager {
         if (utilInstance == null) {
             utilInstance = Util.getInstance();
         }
-        System.out.println("GOT MATRIX MESSAGE: " + message);
+        //System.out.println("GOT MATRIX MESSAGE: " + message);
         ChatComponentText componentMessage = utilInstance.getChatCompWithLinks(message);
         MinecraftServer minecraftServer = MinecraftServer.getServer();
         if (minecraftServer == null) {

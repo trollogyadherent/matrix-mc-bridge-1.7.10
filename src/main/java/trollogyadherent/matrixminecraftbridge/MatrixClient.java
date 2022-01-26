@@ -66,7 +66,7 @@ public class MatrixClient {
             @Override
             public void onEventReceived(List<RoomEvent> roomEvents) throws IOException {
                 for (RoomEvent event : roomEvents) {
-                    System.out.println(event.getRaw().toString());
+                    //System.out.println(event.getRaw().toString());
 
                     if (event.getType().equals("m.room.member") && event.getContent().has("membership") && event.getContent().getString("membership").equals("invite")) {
                         try {
@@ -76,9 +76,9 @@ public class MatrixClient {
                             e.printStackTrace();
                         }
                     } else if (event.getType().equals("m.room.message") && event.getRoom_id().equals(configInstance.getConfigData().getRoomId())) {
-                        System.out.println("RECEIVED MESSAGE EVENT");
+                        //System.out.println("RECEIVED MESSAGE EVENT");
                         if (event.getSender().equals(c.getLoginData().getUser_id())) {
-                            System.out.println("Ignoring own message");
+                            //System.out.println("Ignoring own message");
                             return;
                         }
                         //Sends a readreceipt  for every received message
@@ -125,7 +125,7 @@ public class MatrixClient {
     }
 
     public void sendToMatrix(String message) {
-        System.out.println("received message to send: " + message);
+        //System.out.println("received message to send: " + message);
         if (client == null) {
             System.out.println("Warning client is null!");
             return;

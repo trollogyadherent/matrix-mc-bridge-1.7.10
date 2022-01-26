@@ -13,7 +13,15 @@ public class Config {
     public static Config instance;
 
     public Config() {
-
+        System.setProperty("file.encoding", "UTF-8");
+        java.lang.reflect.Field charset = null;
+        try {
+            charset = java.nio.charset.Charset.class.getDeclaredField("defaultCharset");
+            charset.setAccessible(true);
+            charset.set(null, null);
+        } catch (Exception e) {
+            System.out.println("Something went wrong with charset accessibility");
+        }
         sConfigFile = MatrixMinecraftBridge.CONFIGFILELOCATION;
         try {
             File configFile = new File(sConfigFile);
@@ -21,9 +29,9 @@ public class Config {
                 System.out.println("Configfile not exists. Creating default-config");
                 if (configFile.createNewFile()) {
                     FileHelper.writeFile(sConfigFile, "{\n" +
-                            "  \"host\": \"http://matrix.org\",\n" +
-                            "  \"username\": \"grepbot\",\n" +
-                            "  \"password\": \"wordpass\",\n" +
+                            "  \"host\": \"http://home.server\",\n" +
+                            "  \"username\": \"@matrix-bot:home.server\",\n" +
+                            "  \"password\": \"ilikepie\",\n" +
                             "  \"usertoken\": \"user70ken\"\n" +
                             "  \"roomid\": \"!xxxxxx\"\n" +
                             "  \"startupMessage\": \"❇ Server has started\"\n" +
@@ -31,7 +39,7 @@ public class Config {
                             "  \"joinMessage\": \"✅ %player% has joined the server\"\n" +
                             "  \"leaveMessage\": \"❌ %player% has left the server\"\n" +
                             "  \"deathMessage\": \"\uD83D\uDC80 %player% just died due to %reason%\"\n" +
-                            "  \"achievementMessage\": \"\uD83C\uDF86 %player% just gained the achievement %achievement%\n%description%\"\n" +
+                            "  \"achievementMessage\": \"\uD83C\uDF86 %player% just gained the achievement %achievement%\\n%description%\"\n" +
                             "}\n");
                     System.out.println("Default-config created!\r\n" + "You can pass username and password OR usertoken\r\nAdjust the config and restart the bot\r\nPassword will be cleaned and replaced with usertoken");
                     //System.exit(0);
